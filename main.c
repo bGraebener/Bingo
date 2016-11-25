@@ -66,7 +66,7 @@ void generateCard(int card[3][5], int sizeFirst, int sizeSecond) {
 			}
 
 			allNums[ran] = -1;
-			card[i][j] = num;			
+			card[i][j] = num;
 		}
 	}
 
@@ -88,8 +88,20 @@ void sortCard(int card[3][5], int sizeFirst, int sizeSecond) {
 					card[i][k + 1] = temp;
 				}
 			}
-
 		}
+	}
 
+	for (int i = 0; i < 5; i++) {
+
+		for (int j = 2; j > 0; j--) {
+			for (int k = 0; k < j; k++) {
+				if (card[k][i] > card[k + 1][i]) {
+					int temp = card[k][i];
+					card[k][i] = card[k + 1][i];
+					card[k + 1][i] = temp;
+				}
+
+			}
+		}
 	}
 }
