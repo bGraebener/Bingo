@@ -18,7 +18,7 @@ Player preparePlayer() {
 	generateShortCard(player.displayCard, player.shortCard);		
 
 	player.remaining[0] = 5;										//
-	player.remaining[1] = 5;										//initialise remaining tracker variables
+	player.remaining[1] = 5;										//initialise tracker for remaining numbers 
 	player.remaining[2] = 5;										//
 
 	return player;
@@ -42,6 +42,7 @@ void generateCard(int card[ROW][COL_LONG]) {
 	//fill card with 27 numbers
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL_LONG; col++) {
+
 			do {
 				ran = (rand() % 10);
 			} while (availableNums[col][ran] == -1);					//check if number has already been taken
@@ -98,27 +99,3 @@ void generateShortCard(int card[ROW][COL_LONG], int shortCard[ROW][COL_SHORT]) {
 	}
 }
 
-//convenience function to display a players status
-void displayPlayer(Player player) {
-	printf("\n\t\t\t\tPlayers name: %s", player.name);
-	
-	//display players card
-	printf("\n\t\t\t\tPlayers card");
-	printf("\n\t\t\t\t-----------------------------");
-	
-	
-	for (int row = 0; row < ROW; row++) {
-		printf("\n\t\t\t\t|");
-
-		for (int col = 0; col < COL_LONG; col++) {
-			if (player.displayCard[row][col] != -1) {
-				printf("%2d ", player.displayCard[row][col]);
-			}
-			else {
-				printf("   ");
-			}
-		}
-		printf("|");
-	}
-	printf("\n\t\t\t\t-----------------------------");
-}

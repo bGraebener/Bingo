@@ -6,3 +6,6 @@ void displayMainOptions();
 
 void displayExitOptions();
 void displayGoodbye();
+
+void displayPlayer(Player);
+void displayRemaining(Player);

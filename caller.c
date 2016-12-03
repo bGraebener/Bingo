@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <conio.h>
 
 #include "player.h"
@@ -17,7 +18,6 @@ void drawNumber();
 void markCards();
 boolean checkForWinner(Player);
 void displayStats();
-void displayRemaining(Player);
 void endGame(Player);
 void saveGame();
 void loadGame(int);
@@ -44,6 +44,7 @@ void startGame() {
 		available[i] = i + 1;
 	}
 
+	//get number of players between 2 & 6
 	do {
 		displayTitle();
 		printf("\n\n\t\t\t\tHow many player will be joining us today? (2 - 6)");
@@ -52,24 +53,23 @@ void startGame() {
 		scanf("%d", &numOfPlayers);
 	} while (numOfPlayers < 2 || numOfPlayers > 6);
 
+	//get array to store players
 	playerArray = malloc(sizeof(Player) * numOfPlayers);
 
 	//prepare all the players
 	for (int i = 0; i < numOfPlayers; i++) {
 
+		//generate player cards and display them
 		playerArray[i] = preparePlayer();
-
 		displayPlayer(playerArray[i]);
-
 		printf("\n\n\t\t\t\tPress key to continue...");
 		getch();
 	}
-
 	playGame();
-
 }
 
-
+//main game function
+//displays all main options
 void playGame() {
 
 	int choice;
@@ -86,12 +86,14 @@ void playGame() {
 
 			scanf("%d", &choice);
 		} while (choice < 1 || choice > 3);
-		
+
 		if (choice == 3) {
 			displayGoodbye();
 		}
 		else if (choice == 2) {
-			loadGame(0);
+			int choice = chooseSaveGame();
+			loadGame(choice);
+		
 		}
 		else {
 			startGame();
@@ -105,6 +107,7 @@ void playGame() {
 
 	case 2:
 		saveGame();
+		playGame();
 		break;
 
 	case 1:
@@ -116,7 +119,7 @@ void playGame() {
 	}
 }
 
-
+//draw the next random number and store them in an array
 void drawNumber() {
 
 	int draw;
@@ -124,11 +127,11 @@ void drawNumber() {
 
 	do {
 		ranNum = (rand() % 89) + 1;
-		draw = available[ranNum];
+		draw = available[ranNum];							//get a number from the pool of available numbers
 	} while (draw == -1);
 
-	available[ranNum] = -1;
-	drawn[++roundCounter] = draw;
+	available[ranNum] = -1;									//mark drawn number as unavailable
+	drawn[++roundCounter] = draw;							//update round counter 
 
 	displayTitle();
 	printf("\n\n\t\t\t\tThe %d everybody! The %d was drawn!", draw, drawn[roundCounter]);
@@ -144,7 +147,7 @@ void markCards() {
 	//mark numbers on each card if found
 	for (int i = 0; i < numOfPlayers; i++) {
 
-		//mark on the short card
+		//mark short card
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL_SHORT; col++) {
 				if (playerArray[i].shortCard[row][col] == drawn[roundCounter]) {
@@ -164,20 +167,20 @@ void markCards() {
 				}
 			}
 		}
+
 		gameOver = checkForWinner(playerArray[i]);
 
 		if (gameOver) {
 			break;
 		}
-
 	}
+
 	if (!gameOver) {
 		playGame();
 	}
 	else {
 		endGame(winner);
 	}
-
 }
 
 //function to check for all winning options, returns whether someone got a full house and the game is over
@@ -198,17 +201,18 @@ boolean checkForWinner(Player player) {
 		if (player.shortCard[0][0] == 0 && player.shortCard[0][4] == 0 && player.shortCard[2][0] == 0 && player.shortCard[2][4] == 0) {
 			displayTitle();
 			printf("\n\n\t\t\t\t%s shouts Bingo! I have four corners!", player.name);
-			fourCornersWon = true;
+			fourCornersWon = true;																	//option won't be checked again if once won
 			printf("\n\n\t\t\t\tPress key to continue...");
 			getch();
 		}
 	}
+
+	//check for row winners
 	if (!oneRowWon) {
-		//get remaining for rows
 		if (player.remaining[0] == 0 || player.remaining[1] == 0 || player.remaining[2] == 0) {
 			displayTitle();
 			printf("\n\n\t\t\t\t%s shouts Bingo! I have completed one row!", player.name);
-			oneRowWon = true;
+			oneRowWon = true;																		//option won't be checked again if once won
 			printf("\n\n\t\t\t\tPress key to continue...");
 			getch();
 		}
@@ -218,7 +222,7 @@ boolean checkForWinner(Player player) {
 			if ((player.remaining[0] == 0 && player.remaining[1] == 0) || (player.remaining[0] == 0 && player.remaining[2] == 0) || (player.remaining[2] == 0 && player.remaining[1] == 0)) {
 				displayTitle();
 				printf("\n\n\t\t\t\t%s shouts Bingo! I have completed two rows!", player.name);
-				twoRowsWon = true;
+				twoRowsWon = true;																	//option won't be checked again if once won
 				printf("\n\n\t\t\t\tPress key to continue...");
 				getch();
 			}
@@ -227,7 +231,7 @@ boolean checkForWinner(Player player) {
 	return false;
 }
 
-
+//function to handle a finished game
 void endGame(Player winner) {
 	int choice;
 	do {
@@ -235,7 +239,7 @@ void endGame(Player winner) {
 
 		printf("\n\n\t\t\t\t\t%s won this round of Bingo!", winner.name);
 		printf("\n\t\t\t\t\tWhat's your next move?");
-		printf("\n\n\t\t\t\t\t1 - Play again");
+		printf("\n\n\t\t\t\t\t1 - Play again");											//draw next number option unavailable
 		printf("\n\t\t\t\t\t2 - Save Game");
 		printf("\n\t\t\t\t\t3 - Show Game Status");
 		printf("\n\t\t\t\t\t4 - Exit Game Without Saving");
@@ -250,7 +254,7 @@ void endGame(Player winner) {
 		startGame();
 		break;
 	case 2:
-		//saveGame();
+		saveGame();
 		break;
 	case 3:
 		displayStats();
@@ -267,7 +271,8 @@ void endGame(Player winner) {
 			displayGoodbye();
 		}
 		else if (choice == 2) {
-			loadGame(0);
+			int choice = chooseSaveGame();
+			loadGame(choice);			
 		}
 		else {
 			startGame();
@@ -276,7 +281,6 @@ void endGame(Player winner) {
 	default:
 		break;
 	}
-
 }
 
 void displayStats() {
@@ -306,54 +310,10 @@ void displayStats() {
 	getch();
 }
 
-//display remaining numbers for all winning options
-void displayRemaining(Player player) {
-
-	//remaining for four corners
-	int fourCourners = 4;
-	if (player.shortCard[0][0] == 0) {
-		fourCourners--;
-	}
-	if (player.shortCard[0][4] == 0) {
-		fourCourners--;
-	}
-	if (player.shortCard[2][0] == 0) {
-		fourCourners--;
-	}
-	if (player.shortCard[2][4] == 0) {
-		fourCourners--;
-	}
-
-
-	//remaining for rows
-	int leastNumbers[3];
-
-	for (int i = 0; i < 3; i++) {
-		leastNumbers[i] = player.remaining[i];
-	}
-
-	for (int i = 2; i > 0; i--) {
-		for (int j = 0; j < i; j++) {
-			if (leastNumbers[j] > leastNumbers[j + 1]) {
-				int temp = leastNumbers[j];
-				leastNumbers[j] = leastNumbers[j + 1];
-				leastNumbers[j + 1] = temp;
-			}
-		}
-	}
-
-	printf("\n\n\t\t\t\tNumbers needed to complete four courners: %2d", fourCourners);
-	printf("\n\t\t\t\tNumbers needed to complete a row: %2d", leastNumbers[0]);
-	printf("\n\t\t\t\tNumbers needed to complete two rows: %2d", leastNumbers[0] + leastNumbers[1]);
-	printf("\n\t\t\t\tNumbers needed to complete Full House: %2d", leastNumbers[0] + leastNumbers[1] + leastNumbers[2]);
-
-}
-
+//function to save game
 void saveGame() {
-
-	FILE *output;
-
-	output = fopen("savegame.txt", "a");
+	//open file to append 
+	FILE *output = fopen("savegame.txt", "a");
 
 	if (output == NULL) {
 		printf("Couldn't open file!");
@@ -361,27 +321,18 @@ void saveGame() {
 	}
 
 	//save number of players
-	fprintf(output, "%d\n", numOfPlayers);
+	fprintf(output, "%d ", numOfPlayers);
 
-	//save available number array
-	for (int i = 0; i < 90; i++) {
-		fprintf(output, "%d ", available[i]);
-	}
-	fprintf(output, "\n");
-
-	//save drawn numbers array
-	for (int i = 0; i < 90; i++) {
-		fprintf(output, "%d ", drawn[i]);
-	}
-	fprintf(output, "\n");
+	//save number of rounds
+	fprintf(output, "%d ", roundCounter);
 
 	//save players
 	for (int i = 0; i < numOfPlayers; i++) {
 		//save player name
-		fprintf(output, "%s \n", playerArray[i].name);
+		fprintf(output, "%s ", playerArray[i].name);
 
 		//save remaining rows
-		fprintf(output, "%d %d %d \n", playerArray[i].remaining[0], playerArray[i].remaining[1], playerArray[i].remaining[2]);
+		fprintf(output, "%d %d %d ", playerArray[i].remaining[0], playerArray[i].remaining[1], playerArray[i].remaining[2]);
 
 		//save players card
 		for (int row = 0; row < ROW; row++) {
@@ -389,14 +340,56 @@ void saveGame() {
 				fprintf(output, "%d ", playerArray[i].displayCard[row][col]);
 			}
 		}
-		fprintf(output, "\n");
 	}
 
+	//save drawn numbers array
+	for (int i = 0; i <= roundCounter; i++) {
+		fprintf(output, "%d ", drawn[i]);
+	}
 
+	fprintf(output, "\n");
 	fclose(output);
 }
 
-void loadGame(int start) {
+//find the number of save games and let the user choose one
+int chooseSaveGame() {
+
+	FILE *input;
+	input = fopen("savegame.txt", "r");
+
+	if (input == NULL) {
+		printf("Couldn't open file!");
+		return;
+	}
+
+	//savegames are delimited by a newline char \n
+	//scan the file for \n and count their occurences
+	char tok = '0';
+	int counter = 0;
+
+	while (!feof(input)) {
+		fscanf(input, "%c", &tok);
+		if (tok == 10) {
+			counter++;
+		}
+	}
+
+	//feof adds one \n so subtract one
+	printf("\n\n\t\t\t\tFound %d savegames", counter - 1);
+
+	printf("\n\t\t\t\tChoose a savegame: ");
+
+	int savegame;
+
+	do {
+		scanf("%d", &savegame);
+	} while (savegame < 1 || savegame >(counter - 1));
+
+	return savegame;
+}
+
+
+void loadGame(int savegame) {
 	srand(time(NULL));
 
 	//open save game file
@@ -408,44 +401,76 @@ void loadGame(int start) {
 		return;
 	}
 
-	roundCounter = -1;
+	//find the offset of the chosen savegame
+	char tok = '0';
+	int counter = 0;
+	int offset = 0;
 
+	while (counter != savegame - 1) {			//count the /n until one less than the users choice
+		fscanf(input,"%c", &tok);
+		if (tok == 10) {
+			counter++;							//count newline occurences 
+		}
+		offset++;								//count the offset to start of the savegame
+	}
+
+	fseek(input, offset, 0);					//set scan pointer to the start of the chosen savegame
+
+	//load number of players
 	fscanf(input, "%d", &numOfPlayers);
-
+	
+	//load number of rounds played
+	fscanf(input, "%d", &roundCounter);
+	
 	//initialise player array
 	playerArray = malloc(sizeof(Player) * numOfPlayers);
 
-	//load available numbers array
-	for (int i = 0; i < 90; i++) {
-		fscanf(input, "%d ", &available[i]);
-	}
-
-	//load drawn numbers array
-	for (int i = 0; i < 90; i++) {
-		fscanf(input, "%d ", &drawn[i]);
-		if (drawn[i] != 0) {
-			roundCounter++;
-		}
-	}
 
 	//load players
 	for (int i = 0; i < numOfPlayers; i++) {
 		//load player name
-		fscanf(input, "%s ", playerArray[i].name);
-		fscanf(input, "%d %d %d", &playerArray[i].remaining[0], &playerArray[i].remaining[1], &playerArray[i].remaining[2]);
+		fscanf(input, "%s%n", playerArray[i].name);
+	
+		//bytes_consumed += strlen(playerArray[i].name);
 
-		//save players card
+		//load status tracker array
+		for (int j = 0; j < 3; j++) {
+			fscanf(input, "%d%n", &playerArray[i].remaining[j]);			
+		}
+
+		//load players card
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL_LONG; col++) {
-				fscanf(input, "%d ", &playerArray[i].displayCard[row][col]);
+				fscanf(input, "%2d ", &playerArray[i].displayCard[row][col]);
 			}
 		}
+
 		generateShortCard(playerArray[i].displayCard, playerArray[i].shortCard);
 	}
+
+	//load drawn numbers array
+	for (int i = 0; i <= roundCounter; i++) {
+		fscanf(input, "%d ", &drawn[i]);
+	}
+
+	//set up available numbers array
+	for (int i = 0; i < 90; i++) {
+		available[i] = i + 1;
+	}
+
+	//mark numbers as unavailable
+	for (int i = 0; i <= roundCounter; i++) {
+		for (int j = 0; j < 90; j++) {
+			if (drawn[i] == available[j]) {
+				available[j] = -1;
+				break;
+			}
+		}
+	}
+
+
 	fclose(input);
 
-
-	//markCards();
 	displayStats();
 	playGame();
 }

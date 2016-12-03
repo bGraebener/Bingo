@@ -1,16 +1,16 @@
-//
+//Bingo - Bastian Graebener - 02.12.2016
+//C Programming Project 2016 - Implementation of a Bingo Game
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <conio.h>
 
 #include "displayMenu.h"
 #include "caller.h"
 
-void startGame();
+
 
 void main() {
-	
+
 	int choice;
 
 	do {
@@ -20,20 +20,14 @@ void main() {
 
 	if (choice == 3) {
 		displayGoodbye();
-		getch();
-		return;
 	}
 	else if (choice == 2) {
-		loadGame(0);
+		int choice =  chooseSaveGame();
+		loadGame(choice);		
 	}
 	else {
 		startGame();
 	}
 
-
 	getch();
-	
 }
-
-
-

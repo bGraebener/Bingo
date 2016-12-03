@@ -20,4 +20,4 @@ Player preparePlayer();
 void generateCard(int [ROW][COL_LONG]);
 void generateShortCard(int [ROW][COL_LONG], int [ROW][COL_SHORT]);
 void sortCard(int [ROW][COL_LONG]);
-void displayPlayer(Player);
+
