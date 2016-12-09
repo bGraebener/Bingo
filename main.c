@@ -4,14 +4,14 @@
 #include <stdio.h>
 #include <conio.h>
 
+#include "persistance.h"
 #include "displayMenu.h"
 #include "caller.h"
-
-
 
 void main() {
 
 	int choice;
+	int test;
 
 	do {
 		displayStartMenu();
@@ -23,11 +23,11 @@ void main() {
 	}
 	else if (choice == 2) {
 		int choice =  chooseSaveGame();
-		loadGame(choice);		
+		mainLoadHandler(choice);
 	}
 	else {
 		startGame();
 	}
 
-	getch();
+	_getch();
 }

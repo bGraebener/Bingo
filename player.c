@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "displayMenu.h"
 #include "player.h"
@@ -15,23 +16,23 @@ Player preparePlayer() {
 
 	generateCard(player.displayCard);
 
-	generateShortCard(player.displayCard, player.shortCard);		
+	generateShortCard(player.displayCard, player.shortCard);
 
 	player.remaining[0] = 5;										//
-	player.remaining[1] = 5;										//initialise tracker for remaining numbers 
+	player.remaining[1] = 5;										//initialise tracker for remaining numbers
 	player.remaining[2] = 5;										//
 
 	return player;
 }
 
-//generate the card with empty fields 
+//generate the card with empty fields
 void generateCard(int card[ROW][COL_LONG]) {
 	//seed for RNG
 	srand(time(NULL));
 
 	int ran;
 
-	//numbers 1 - 90 in ranges of 10th 
+	//numbers 1 - 90 in ranges of 10th
 	int availableNums[9][10];
 	for (int row = 0; row < 9; row++) {
 		for (int col = 0; col < 10; col++) {
@@ -64,7 +65,7 @@ void generateCard(int card[ROW][COL_LONG]) {
 
 			card[row][ran] = -1;									//-1 == empty field in card
 		}
-	}	
+	}
 }
 
 
@@ -94,7 +95,7 @@ void generateShortCard(int card[ROW][COL_LONG], int shortCard[ROW][COL_SHORT]) {
 		for (int col = 0; col < COL_LONG; col++) {
 			if (card[row][col] != -1) {
 				shortCard[row][shortCol++] = card[row][col];
-			}			
+			}
 		}
 	}
 }

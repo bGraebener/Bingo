@@ -1,7 +1,7 @@
 #pragma once
-
+#include <conio.h>
 #include <stdio.h>
-#include "player.h"
+#include "displayMenu.h"
 
 void displayTitle() {
 	system("cls");
@@ -26,7 +26,7 @@ void displayMainOptions() {
 	printf("\n\n\t\t\t\t\t1 - Draw a number");
 	printf("\n\t\t\t\t\t2 - Save Game");
 	printf("\n\t\t\t\t\t3 - Show Game Status");
-	printf("\n\t\t\t\t\t4 - Exit Game Without Saving");
+	printf("\n\t\t\t\t\t4 - Exit Game");
 	printf("\n\n\t\t\t\t\tYour choice: ");
 
 }
@@ -49,9 +49,10 @@ void displayGoodbye() {
 	printf("\n\n\t\t\t\t\tGoodbye - See you next time!");
 }
 
+
 //convenience function to display a players status
-void displayPlayer(Player player) {
-	printf("\n\t\t\t\tPlayers name: %s", player.name);
+void displayPlayer(Player *player) {
+	printf("\n\t\t\t\tPlayers name: %s", player->name);
 
 	//display players card
 	printf("\n\t\t\t\tPlayers card");
@@ -61,8 +62,8 @@ void displayPlayer(Player player) {
 		printf("\n\t\t\t\t|");
 
 		for (int col = 0; col < COL_LONG; col++) {
-			if (player.displayCard[row][col] != -1) {
-				printf("%2d ", player.displayCard[row][col]);
+			if (player->displayCard[row][col] != -1) {
+				printf("%2d ", player->displayCard[row][col]);
 			}
 			else {
 				printf("   ");
@@ -74,22 +75,21 @@ void displayPlayer(Player player) {
 }
 
 
-
 //display remaining numbers for all winning options
-void displayRemaining(Player player) {
+void displayRemaining(Player *player) {
 
 	//remaining for four corners
 	int fourCourners = 4;
-	if (player.shortCard[0][0] == 0) {
+	if (player->shortCard[0][0] == 0) {
 		fourCourners--;
 	}
-	if (player.shortCard[0][4] == 0) {
+	if (player->shortCard[0][4] == 0) {
 		fourCourners--;
 	}
-	if (player.shortCard[2][0] == 0) {
+	if (player->shortCard[2][0] == 0) {
 		fourCourners--;
 	}
-	if (player.shortCard[2][4] == 0) {
+	if (player->shortCard[2][4] == 0) {
 		fourCourners--;
 	}
 
@@ -98,7 +98,7 @@ void displayRemaining(Player player) {
 	int leastNumbers[3];
 
 	for (int i = 0; i < 3; i++) {
-		leastNumbers[i] = player.remaining[i];
+		leastNumbers[i] = player->remaining[i];
 	}
 
 	for (int i = 2; i > 0; i--) {
@@ -116,4 +116,33 @@ void displayRemaining(Player player) {
 	printf("\n\t\t\t\tNumbers needed to complete two rows: %2d", leastNumbers[0] + leastNumbers[1]);
 	printf("\n\t\t\t\tNumbers needed to complete Full House: %2d", leastNumbers[0] + leastNumbers[1] + leastNumbers[2]);
 
+}
+
+
+//shows the games' current status, with rounds played, all drawn numbers and players' cards with zero for marked numbers
+void displayStats(Caller *caller) {
+
+	displayTitle();
+	printf("\n\n\t\t\t\tCurrent stats: ");
+	printf("\n\n\t\t\t\t%d rounds played so far!", caller->roundCounter + 1);
+
+	//display already drawn numbers
+	printf("\n\t\t\t\tDrawn numbers:");
+	printf("\n\t\t\t\t");
+	for (int i = 0; i <= caller->roundCounter; i++) {
+		printf("%2d ", caller->drawn[i]);
+		if (i > 0 && i % 10 == 0) {
+			printf("\n\t\t\t\t");
+		}
+	}
+
+	//display player cards and remaining numbers
+	for (int i = 0; i < caller->numOfPlayers; i++) {
+		printf("\n");
+		displayPlayer(&caller->playerArray[i]);
+		displayRemaining(&caller->playerArray[i]);
+	}
+
+	printf("\n\n\t\t\t\tPress key to continue...");
+	_getch();
 }
