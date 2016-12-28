@@ -5,9 +5,8 @@
 //global variable
 Caller caller;
 
-
 void startGame() {
-	srand(time(NULL));
+	srand(time(NULL));                                      //seed for the random number generator
 	caller.roundCounter = -1;
 
 	//initialise available numbers array
@@ -62,7 +61,6 @@ void playGame() {
 
 	case 2:
 		saveGame(caller);
-		//displayTitle();
 		playGame();
 		break;
 
@@ -87,7 +85,7 @@ void drawNumber() {
 	} while (draw == -1);
 
 	caller.available[ranNum] = -1;									//mark drawn number as unavailable in pool of available numbers
-	caller.drawn[++caller.roundCounter] = draw;						//update round counter
+	caller.drawn[++caller.roundCounter] = draw;						//update round counter and array of already frawn numbers
 
 	displayTitle();
 	printf("\n\n\t\t\t\tThe %d everybody! The %d was drawn!", draw, caller.drawn[caller.roundCounter]);
@@ -101,9 +99,9 @@ void drawNumber() {
 //mark all player cards and check if there's a winner
 void markCards() {
 	boolean gameOver;
-	
+
 	for (int i = 0; i < caller.numOfPlayers; i++) {															//mark numbers on each card if found
-		
+
 		for (int row = 0; row < ROW; row++) {																//mark short card
 			for (int col = 0; col < COL_SHORT; col++) {
 				if (caller.playerArray[i].shortCard[row][col] == caller.drawn[caller.roundCounter]) {
@@ -113,7 +111,7 @@ void markCards() {
 				}
 			}
 		}
-		
+
 		for (int row = 0; row < ROW; row++) {																//mark display card
 			for (int col = 0; col < COL_LONG; col++) {
 				if (caller.playerArray[i].displayCard[row][col] == caller.drawn[caller.roundCounter]) {
@@ -122,7 +120,6 @@ void markCards() {
 				}
 			}
 		}
-
 		gameOver = checkForWinner(&caller.playerArray[i]);													//check for all winning options
 
 		if (gameOver) {
@@ -155,27 +152,26 @@ boolean checkForWinner(Player *player) {
 	checkRows(player);
 	return false;
 }
-
-void checkFourCorners(Player *player) {	
+//function that checks for the four corners winning option
+void checkFourCorners(Player *player) {
 	if (!caller.fourCornersWon) {																			//check four corners of the players card array
 		if (player->shortCard[0][0] == 0 && player->shortCard[0][4] == 0 && player->shortCard[2][0] == 0 && player->shortCard[2][4] == 0) {
 			displayTitle();
-			printf("\n\n\t\t\t\t%s shouts Bingo! I have four corners!", player->name);
 			caller.fourCornersWon = true;																	//option won't be checked again if once won
+			printf("\n\n\t\t\t\t%s shouts Bingo! I have four corners!", player->name);
 			printf("\n\n\t\t\t\tPress key to continue...");
 			_getch();
 		}
 	}
 }
 
-
+//function that checks for the one and two row winnig options
 void checkRows(Player *player) {
-	
 	if (!caller.oneRowWon) {																				//check for one row winner
 		if (player->remaining[0] == 0 || player->remaining[1] == 0 || player->remaining[2] == 0) {
+			caller.oneRowWon = true;																		//option won't be checked again if once won
 			displayTitle();
 			printf("\n\n\t\t\t\t%s shouts Bingo! I have completed one row!", player->name);
-			caller.oneRowWon = true;																		//option won't be checked again if once won
 			printf("\n\n\t\t\t\tPress key to continue...");
 			_getch();
 		}
@@ -183,16 +179,15 @@ void checkRows(Player *player) {
 	else {
 		if (!caller.twoRowsWon) {																			//check for two row winner
 			if ((player->remaining[0] == 0 && player->remaining[1] == 0) || (player->remaining[0] == 0 && player->remaining[2] == 0) || (player->remaining[2] == 0 && player->remaining[1] == 0)) {
+				caller.twoRowsWon = true;																	//option won't be checked again if once won
 				displayTitle();
 				printf("\n\n\t\t\t\t%s shouts Bingo! I have completed two rows!", player->name);
-				caller.twoRowsWon = true;																	//option won't be checked again if once won
 				printf("\n\n\t\t\t\tPress key to continue...");
 				_getch();
 			}
 		}
 	}
 }
-
 
 //function to handle a finished game
 void endGame() {
@@ -239,7 +234,6 @@ void mainLoadHandler(int offset) {
 	playGame();
 }
 
-
 //function that is called if the user wishes to exit the current game
 void exitHandler() {
 	int choice;
@@ -251,7 +245,7 @@ void exitHandler() {
 	} while (choice < 1 || choice > 3);
 
 	if (choice == 3) {
-		free(caller.playerArray);
+		free(caller.playerArray);                                       //release dynamically allocated heap space
 		displayGoodbye();
 	}
 	else if (choice == 2) {

@@ -11,7 +11,6 @@
 void main() {
 
 	int choice;
-	int test;
 
 	do {
 		displayStartMenu();
@@ -22,12 +21,11 @@ void main() {
 		displayGoodbye();
 	}
 	else if (choice == 2) {
-		int choice =  chooseSaveGame();
+		int choice = chooseSaveGame();
 		mainLoadHandler(choice);
 	}
 	else {
 		startGame();
 	}
-
 	_getch();
 }

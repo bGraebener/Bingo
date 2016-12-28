@@ -11,7 +11,7 @@ typedef struct {
 	int displayCard[ROW][COL_LONG];			//cards with empty fields - for display only
 	int shortCard[ROW][COL_SHORT];			//card used to determine winner
 
-	int remaining[3];						//variables used to keep track of status
+	int remaining[3];						//array used to keep track of remaining numbers per row
 
 }Player;
 

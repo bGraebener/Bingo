@@ -1,6 +1,7 @@
 #pragma once
 #include <conio.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "displayMenu.h"
 
 void displayTitle() {
@@ -18,7 +19,6 @@ void displayStartMenu() {
 	printf("\n\n\t\t\t\t\tYour choice: ");
 }
 
-
 void displayMainOptions() {
 	displayTitle();
 
@@ -28,10 +28,7 @@ void displayMainOptions() {
 	printf("\n\t\t\t\t\t3 - Show Game Status");
 	printf("\n\t\t\t\t\t4 - Exit Game");
 	printf("\n\n\t\t\t\t\tYour choice: ");
-
 }
-
-
 
 void displayExitOptions() {
 	displayTitle();
@@ -52,10 +49,9 @@ void displayGoodbye() {
 
 //convenience function to display a players status
 void displayPlayer(Player *player) {
-	printf("\n\t\t\t\tPlayers name: %s", player->name);
 
 	//display players card
-	printf("\n\t\t\t\tPlayers card");
+	printf("\n\t\t\t\t%ss card", player->name);
 	printf("\n\t\t\t\t-----------------------------");
 
 	for (int row = 0; row < ROW; row++) {

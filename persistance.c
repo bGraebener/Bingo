@@ -1,10 +1,9 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
-#include "persistance.h"
 
+#include "persistance.h"
 
 //function to save game
 void saveGame(Caller caller) {
@@ -23,9 +22,9 @@ void saveGame(Caller caller) {
 	for (int i = 0; i < caller.numOfPlayers; i++) {
 		fprintf(output, "%s ", caller.playerArray[i].name);								//save player name
 
-		//save remaining rows
+		//save remaining numbers to win a row
 		fprintf(output, "%d %d %d ", caller.playerArray[i].remaining[0], caller.playerArray[i].remaining[1], caller.playerArray[i].remaining[2]);
-				
+
 		for (int row = 0; row < ROW; row++) {											//save players card
 			for (int col = 0; col < COL_LONG; col++) {
 				fprintf(output, "%d ", caller.playerArray[i].displayCard[row][col]);
@@ -55,6 +54,7 @@ int chooseSaveGame() {
 	int result;
 	int offset = 0;
 
+    //open file in 'read' mode
 	FILE *input;
 	input = fopen("savegame.txt", "r");
 
@@ -62,7 +62,7 @@ int chooseSaveGame() {
 		printf("Couldn't open file!");
 		return 2;
 	}
-	
+
 	//scan the file by line and count their amount
 	while (!feof(input)) {
 		result = fgets(buffer, 1024, input);
@@ -77,18 +77,18 @@ int chooseSaveGame() {
 	do {
 		scanf("%d", &userChoice);
 	} while (userChoice < 1 || userChoice > counter);								//let the user choose a savegame
-		
 
-	//find the offset of the chosen savegame	
+
+	//find the offset of the chosen savegame
 	fseek(input, 0, SEEK_SET);														//go back to the start of the file
 	counter = 0;
 
-	while (counter != userChoice - 1) {												//loop until one less than the users choice
+	while (counter != (userChoice - 1)) {												//loop until one less than the users choice
 		result = fgets(buffer, 1024, input);
 		if (result > 0) {
 			counter++;																//count line numbers
 		}
-		offset = ftell(input);														//store the position of the pointer 
+		offset = ftell(input);														//store the position of the pointer
 	}
 
 	fclose(input);
@@ -112,7 +112,7 @@ Caller loadGame(int offset) {
 		printf("Couldn't open file!");
 		return;
 	}
-	
+
 	fseek(input, offset, SEEK_SET);													//set scan pointer to the start of the chosen savegame
 
 	fscanf(input, "%d", &caller.numOfPlayers);										//load number of players
@@ -123,11 +123,11 @@ Caller loadGame(int offset) {
 	//load players
 	for (int i = 0; i <caller.numOfPlayers; i++) {
 		fscanf(input, "%s", caller.playerArray[i].name);							//load player name
-																					
+
 		for (int j = 0; j < 3; j++) {												//load remaining tracker array
 			fscanf(input, "%d", &caller.playerArray[i].remaining[j]);
 		}
-				
+
 		for (int row = 0; row < ROW; row++) {										//load players card
 			for (int col = 0; col < COL_LONG; col++) {
 				fscanf(input, "%2d ", &caller.playerArray[i].displayCard[row][col]);
@@ -137,15 +137,15 @@ Caller loadGame(int offset) {
 		generateShortCard(caller.playerArray[i].displayCard, caller.playerArray[i].shortCard);
 
 	}//end load players
-	
+
 	for (int i = 0; i <= caller.roundCounter; i++) {								//load drawn numbers array
 		fscanf(input, "%d ", &caller.drawn[i]);
 	}
-		
+
 	for (int i = 0; i < 90; i++) {													//set up available numbers array
 		caller.available[i] = i + 1;
 	}
-	
+
 	for (int i = 0; i <= caller.roundCounter; i++) {								//mark numbers as unavailable
 		for (int j = 0; j < 90; j++) {
 			if (caller.drawn[i] == caller.available[j]) {
